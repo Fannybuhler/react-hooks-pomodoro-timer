@@ -7,7 +7,7 @@ import SessionLength from "./components/SessionLength";
 function App() {
     const [breakLength, setBreaklength] = useState(5);
     const [sessionLength, setSessionlength] = useState(25);
-    let [timerMinute, setTimerMinute] = useState(25);
+    const [timerMinute, setTimerMinute] = useState(25);
 
     function onIncreaseBreakLength() {
 		setBreaklength(breakLength + 1)
@@ -28,15 +28,15 @@ function App() {
 	}
 
 	function onUpdateTimerMinute() {
-		setTimerMinute(timerMinute - 1)
+		setTimerMinute(timerMinute => timerMinute - 1)
 	}
 
 	function onToggleInterval(isSession) {
 		if(isSession) {
-			setTimerMinute(timerMinute = sessionLength)
+			setTimerMinute(sessionLength)
 			console.log('set timer to session length')
 		} else {
-			setTimerMinute(timerMinute = breakLength)
+			setTimerMinute(breakLength)
 			console.log('set timer to break length')
 		}
 	}

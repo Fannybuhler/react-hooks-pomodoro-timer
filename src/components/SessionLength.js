@@ -2,7 +2,7 @@ import React from 'react'
 
 const SessionLength = (props) => {
     function decreaseSession() {
-        if (props.breakLength === 1) {
+        if (props.sessionLength === 0) {
             return;
         }
 

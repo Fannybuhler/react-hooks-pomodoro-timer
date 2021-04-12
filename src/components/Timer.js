@@ -1,10 +1,18 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 
 const Timer = (props) => {
     let [isSession, setIsSession] = useState(true);
     let [timerSecond, setTimerSecond] = useState(0);
 	let [intervalID, setIntervalID] = useState(0);
+
+	useEffect(() => {
+		props.toggleInterval(isSession)
+	}, [isSession])
+
+	useEffect(() => {
+		console.log(timerSecond)
+	}, [timerSecond])
 
 	function play() {
 		let interval = setInterval(decreaseTimer, 1000)
@@ -26,24 +34,23 @@ const Timer = (props) => {
 		switch(timerSecond) {
 			case 0:
 				console.log("entered case 0")
-				// if(props.timerMinute === 0) {
-				// 	console.log("timer minute is 0")
-				// 	if(isSession) {
-				// 		setIsSession(isSession => isSession = false)
-				// 		props.toggleInterval(isSession)
-				// 		console.log(isSession)
-				// 	}
-				// } else {
-				// 	setIsSession(isSession => isSession = true)
-				// 	props.toggleInterval(isSession)
-				// 	console.log(isSession)
-				// }
+				if(props.timerMinute === 0) {
+					console.log("timer minute is 0")
+					if(isSession) {
+						setIsSession(false)
+					} else {
+						setIsSession(true)
+					}
+				}
+
 				props.updateTimerMinute()
-				setTimerSecond(timerSecond = 59)
+				setTimerSecond(59)
+				
 				break;
 			default:
 				console.log("entered default")
-				return setTimerSecond(timerSecond => timerSecond - 1)
+				setTimerSecond(timerSecond => timerSecond - 1)
+				break;
 		}
 	}
 

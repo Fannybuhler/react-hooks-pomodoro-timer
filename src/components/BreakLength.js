@@ -10,7 +10,7 @@ const BreakLength = (props) => {
     }
 
     function increaseCounter() {
-        if (props.sessionLength === 60) {
+        if (props.breakLength === 60) {
             return;
         }
 
