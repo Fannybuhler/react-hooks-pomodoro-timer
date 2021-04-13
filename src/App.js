@@ -28,7 +28,8 @@ function App() {
 	}
 
 	function onUpdateTimerMinute() {
-		setTimerMinute(timerMinute => timerMinute - 1)
+		setTimerMinute(timerMinute - 1)
+		console.log("updated timer minute to: ", timerMinute)
 	}
 
 	function onToggleInterval(isSession) {

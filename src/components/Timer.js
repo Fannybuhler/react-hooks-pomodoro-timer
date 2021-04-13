@@ -2,21 +2,35 @@ import React from "react";
 import { useState, useEffect} from "react";
 
 const Timer = (props) => {
-    let [isSession, setIsSession] = useState(true);
-    let [timerSecond, setTimerSecond] = useState(0);
-	let [intervalID, setIntervalID] = useState(0);
+	const [isSession, setIsSession] = useState(true);
+    const [timerSecond, setTimerSecond] = useState(0);
+	const [intervalID, setIntervalID] = useState(0);
+
+	const [counter, changeCounter] = useState(0);
+ 
+	useEffect(() => {
+		const interval = setInterval(() => {
+		if(counter )
+		changeCounter(prevCounter => prevCounter + 1);
+		console.log(counter)
+		}, 500);
+	
+		return () => clearInterval(interval);
+	}, [counter]); ///<--- this right here
 
 	useEffect(() => {
 		props.toggleInterval(isSession)
+		console.log("isSession: ", isSession)
 	}, [isSession])
 
 	useEffect(() => {
-		console.log(timerSecond)
+		console.log("timer second: ", timerSecond)
 	}, [timerSecond])
 
+	
 	function play() {
-		let interval = setInterval(decreaseTimer, 1000)
-		setIntervalID(intervalID = interval)
+		let interval = setInterval(decreaseTimer, 500)
+		setIntervalID(interval)
 	}
 
 	function pause() {
@@ -26,7 +40,7 @@ const Timer = (props) => {
 	function reset() {
 		pause()
 		props.resetTimer()
-		setTimerSecond(timerSecond = 0)
+		setTimerSecond(0)
 	}
 
 
@@ -35,7 +49,7 @@ const Timer = (props) => {
 			case 0:
 				console.log("entered case 0")
 				if(props.timerMinute === 0) {
-					console.log("timer minute is 0")
+					console.log("timer minute is: ", props.timerMinute)
 					if(isSession) {
 						setIsSession(false)
 					} else {
@@ -45,12 +59,11 @@ const Timer = (props) => {
 
 				props.updateTimerMinute()
 				setTimerSecond(59)
-				
 				break;
+
 			default:
 				console.log("entered default")
-				setTimerSecond(timerSecond => timerSecond - 1)
-				break;
+				setTimerSecond(prevTimerSecond => prevTimerSecond - 1)
 		}
 	}
 
