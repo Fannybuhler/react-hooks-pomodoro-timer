@@ -1,70 +1,126 @@
 import React, { useState, useEffect } from "react";
 import "./Style/App.css";
-import Timer from "./components/Timer";
-import BreakLength from "./components/BreakLength";
-import SessionLength from "./components/SessionLength";
+import Break from "./components/Break";
+import Session from "./components/Session";
+import TimeLeft from "./components/TimeLeft";
 
 function App() {
-    const [breakLength, setBreaklength] = useState(5);
-    const [sessionLength, setSessionlength] = useState(25);
-    const [timerMinute, setTimerMinute] = useState(25);
+    // const audioElement = useRef(null);
+    const [currentSessionType, setCurrentSessionType] = useState("Session"); // 'Session' or 'Break'
+    const [intervalId, setIntervalId] = useState(null);
+    const [sessionLength, setSessionLength] = useState(60 * 25);
+    const [breakLength, setBreakLength] = useState(300);
+    const [timeLeft, setTimeLeft] = useState(sessionLength);
 
-    function onIncreaseBreakLength() {
-		setBreaklength(breakLength + 1)
-	}
+    // change timeLeft whenever sessionLength changes
+    useEffect(() => {
+        setTimeLeft(sessionLength);
+    }, [sessionLength]);
+    
+    useEffect(() => {
+        if(timeLeft === 0) {
+            if (currentSessionType === "Session") {
+                setCurrentSessionType("Break");
+                setTimeLeft(breakLength);
+            } else if (currentSessionType === "Break") {
+                setCurrentSessionType("Session");
+                setTimeLeft(sessionLength);
+            }
+        };
+    }, [timeLeft, currentSessionType, breakLength, sessionLength]);
 
-	function onDecreaseBreakLength() {
-		setBreaklength(breakLength - 1)
-	}
+    const decrementBreakLengthByOneMinute = () => {
+        const newBreakLength = breakLength - 60;
 
-	function onIncreaseSessionLength() {
-		setSessionlength(sessionLength + 1)
-		setTimerMinute(timerMinute + 1)
-	}
+        if (newBreakLength < 0) {
+            setBreakLength(0);
+        } else {
+            setBreakLength(newBreakLength);
+        }
+    };
 
-	function onDecreaseSessionLength() {
-		setSessionlength(sessionLength - 1)
-		setTimerMinute(timerMinute - 1)
-	}
+    const incrementBreakLengthByOneMinute = () => {
+        setBreakLength(breakLength + 60);
+    };
 
-	function onUpdateTimerMinute() {
-		setTimerMinute(timerMinute - 1)
-		console.log("updated timer minute to: ", timerMinute)
-	}
+    const decrementSessionLengthByOneMinute = () => {
+        const newSessionLength = sessionLength - 60;
 
-	function onToggleInterval(isSession) {
-		if(isSession) {
-			setTimerMinute(sessionLength)
-			console.log('set timer to session length')
-		} else {
-			setTimerMinute(breakLength)
-			console.log('set timer to break length')
-		}
-	}
+        if (newSessionLength < 0) {
+            setSessionLength(0);
+        } else {
+            setSessionLength(newSessionLength);
+        }
+    };
 
-	function onResetTimer() {
-		setTimerMinute(sessionLength)
-		console.log("reset timer")
-	}
+    const incrementSessionLengthByOneMinute = () => {
+        setSessionLength(sessionLength + 60);
+    };
+
+    const isStarted = intervalId !== null;
+    const handleStartStopClick = () => {
+        if (isStarted) {
+            clearInterval(intervalId);
+            setIntervalId(null);
+        } else {
+            const newIntervalId = setInterval(() => {
+                setTimeLeft((prevTimeLeft) => {
+                    const newTimeLeft = prevTimeLeft - 1;
+                    if (newTimeLeft >= 0) {
+                        return prevTimeLeft - 1;
+                    }
+                    //audioElement.current.play();
+                });
+            }, 100);
+            setIntervalId(newIntervalId);
+        }
+    };
+
+    const handleResetButtonClick = () => {
+        //audioElement.current.load();
+        clearInterval(intervalId);
+        setIntervalId(null);
+        setCurrentSessionType("Session");
+        setSessionLength(60 * 25);
+        setBreakLength(60 * 5);
+        setTimeLeft(60 * 25);
+    };
 
     return (
         <div className="App">
-            <h1>Hello World</h1>
-            <BreakLength
+            <Break
                 breakLength={breakLength}
-                increaseBreak={onIncreaseBreakLength}
-				decreaseBreak={onDecreaseBreakLength}
+                decrementBreakLengthByOneMinute={
+                    decrementBreakLengthByOneMinute
+                }
+                incrementBreakLengthByOneMinute={
+                    incrementBreakLengthByOneMinute
+                }
             />
-            <SessionLength 
-				sessionLength={sessionLength}
-				increaseSession={onIncreaseSessionLength}
-				decreaseSession={onDecreaseSessionLength} />
-            <Timer 
-				timerMinute={timerMinute}
-				breakLength={breakLength}
-				updateTimerMinute={onUpdateTimerMinute}
-				toggleInterval={onToggleInterval}
-				resetTimer={onResetTimer} />
+            <TimeLeft
+                handleStartStopClick={handleStartStopClick}
+                timerLabel={currentSessionType}
+                startStopButtonLabel={isStarted ? "Stop" : "Start"}
+                timeLeft={timeLeft}
+            />
+            <Session
+                sessionLength={sessionLength}
+                decrementSessionLengthByOneMinute={
+                    decrementSessionLengthByOneMinute
+                }
+                incrementSessionLengthByOneMinute={
+                    incrementSessionLengthByOneMinute
+                }
+            />
+            <button id="reset" onClick={handleResetButtonClick}>
+                Reset
+            </button>
+            {/* <audio id="beep" ref={audioElement}>
+                <source
+                    src="https://onlineclock.net/audio/options/default.mp3"
+                    type="audio/mpeg"
+                />
+            </audio> */}
         </div>
     );
 }
